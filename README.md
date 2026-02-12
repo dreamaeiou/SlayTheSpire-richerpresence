@@ -1,6 +1,8 @@
 # Slay the Spire Richer Presence Mod
 
-一个为《杀戮尖塔》游戏设计的丰富状态显示Mod，可以在Steam和Discord上显示更详细的游戏状态信息。
+一个为《杀戮尖塔》游戏设计的丰富状态显示Mod，可以在Steam上显示更详细的游戏状态信息。
+
+> **致谢**：本项目基于Somdy的原始代码进行改进和优化，感谢Somdy的开源贡献。
 
 ## 功能特性
 
@@ -17,7 +19,6 @@
 
 ### 🔧 平台兼容
 - **Steam**：在Steam好友列表中显示详细状态
-- **Discord**：在Discord状态中显示游戏信息
 
 ## 安装方法
 
@@ -53,6 +54,11 @@ mvn clean package
 - **RichPresenceUpdater**：状态信息更新器
 - **CharacterRichPresenceProxy**：角色状态显示代理
 - **RichPresenceDistributor**：状态信息分发器
+
+### 基于Somdy代码的改进
+- 修复了boss战斗时怪物名称显示问题
+- 优化了状态更新逻辑
+- 改进了多语言支持
 
 ## 配置说明
 
