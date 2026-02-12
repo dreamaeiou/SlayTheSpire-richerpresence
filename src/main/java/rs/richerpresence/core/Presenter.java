@@ -7,6 +7,7 @@ import basemod.interfaces.ISubscriber;
 import basemod.interfaces.OnPlayerTurnStartSubscriber;
 import basemod.interfaces.OnStartBattleSubscriber;
 import basemod.interfaces.PostBattleSubscriber;
+import basemod.interfaces.PostCampfireSubscriber;
 import com.codedisaster.steamworks.SteamFriends;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import com.megacrit.cardcrawl.integrations.DistributorFactory;
@@ -19,7 +20,7 @@ import rs.lazymankits.LMDebug;
 import rs.richerpresence.utils.RPUtils;
 
 @SpireInitializer
-public class Presenter implements EditStringsSubscriber, OnStartBattleSubscriber, OnPlayerTurnStartSubscriber, PostBattleSubscriber {
+public class Presenter implements EditStringsSubscriber, OnStartBattleSubscriber, OnPlayerTurnStartSubscriber, PostBattleSubscriber, PostCampfireSubscriber {
   public static final String MOD_ID = "RicherPresence";
   
   public static final String PREFIX = "richerpre";
@@ -132,4 +133,12 @@ public class Presenter implements EditStringsSubscriber, OnStartBattleSubscriber
     Log("receivePostBattle called");
     RichPresenceDistributor.OnRoomTransition();
   }
+  
+  public boolean receivePostCampfire() {
+    Log("receivePostCampfire called");
+    RichPresenceDistributor.OnCampfire();
+    return true;
+  }
+
+
 }
