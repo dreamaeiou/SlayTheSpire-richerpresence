@@ -20,21 +20,47 @@ import rs.richerpresence.character.CharacterRichPresenceProxy;
 import rs.richerpresence.utils.RPUtils;
 import rs.richerpresence.utils.RemarkableThing;
 
+/**
+ * 富状态更新器
+ * 负责更新和管理Steam/Discord富状态的各种显示信息
+ * 包括概览状态、行动状态、特殊事件状态等
+ */
 public class RichPresenceUpdater {
+  /** 概览状态文本 - 显示玩家角色、进度等基本信息 */
   protected static String OVERVIEW_PRESENCE;
   
+  /** 行动状态文本 - 显示当前房间的具体活动（战斗、事件、休息等） */
   protected static String ACTION_PRESENCE;
   
+  /** 特殊事件状态文本 - 显示特殊的升级、选择等事件 */
   protected static String REMARKABLE__PRESENCE;
   
+  /** 战斗状态标志 - 标识当前是否处于战斗状态 */
   private static boolean battleState = false;
   
+  /**
+   * 更新概览状态
+   * 概览状态包含玩家角色、游戏模式、进度等基本信息
+   * 
+   * @param player 当前玩家对象
+   * @param ascension 当前难度等级
+   * @param floorNum 当前楼层号
+   * @param actNum 当前幕数
+   */
   protected static void UpdateOverviewPresence(AbstractPlayer player, int ascension, int floorNum, int actNum) {
     String displayName = getCharacterDisplayName(player);
     String msg = getCharacterRichPresenceOverviewDisplay(displayName, ascension, floorNum, actNum);
     OVERVIEW_PRESENCE = msg;
   }
   
+  /**
+   * 更新行动状态
+   * 行动状态根据当前房间类型显示不同的活动信息（战斗、事件、休息等）
+   * 
+   * @param ascension 当前难度等级
+   * @param floorNum 当前楼层号
+   * @param actNum 当前幕数
+   */
   protected static void UpdateActionPresence(int ascension, int floorNum, int actNum) {
     String msg = null;
     boolean isMonsterRoom = RPUtils.RoomChecker(MonsterRoom.class);
@@ -97,6 +123,15 @@ public class RichPresenceUpdater {
     }
   }
   
+  /**
+   * 更新特殊事件状态
+   * 处理游戏中特殊事件的状态更新，如卡牌升级等
+   * 
+   * @param remarkable 特殊事件对象
+   * @param ascension 当前难度等级
+   * @param floorNum 当前楼层号
+   * @param actNum 当前幕数
+   */
   public static void UpdateRemarkablePresence(RemarkableThing remarkable, int ascension, int floorNum, int actNum) {
     Object remark;
     switch (remarkable.desc) {
@@ -155,10 +190,20 @@ public class RichPresenceUpdater {
     return player.getLocalizedCharacterName();
   }
   
+  /**
+   * 检查当前是否处于战斗状态
+   * 
+   * @return 如果处于战斗状态返回true，否则返回false
+   */
   public static boolean isInBattleState() {
     return battleState;
   }
   
+  /**
+   * 设置战斗状态
+   * 
+   * @param inBattle 是否处于战斗状态
+   */
   public static void setInBattleState(boolean inBattle) {
     battleState = inBattle;
     RPUtils.Log("Battle state set to: " + battleState);

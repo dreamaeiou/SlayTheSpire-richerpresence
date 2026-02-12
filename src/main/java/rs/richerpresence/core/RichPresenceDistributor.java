@@ -5,7 +5,17 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import rs.richerpresence.character.CharacterRichPresenceProxy;
 
+/**
+ * 富状态分发器
+ * 负责在游戏的不同事件和状态变化时触发相应的富状态更新
+ * 处理房间转换、战斗、升级卡牌等各种游戏事件的状态更新
+ */
 public class RichPresenceDistributor {
+  /**
+   * 房间转换时的状态更新处理
+   * 当玩家从一个房间移动到另一个房间时调用
+   * 根据房间类型和游戏状态更新相应的富状态信息
+   */
   public static void OnRoomTransition() {
     // 安全检查：确保游戏已经初始化完成
     if (AbstractDungeon.player == null || AbstractDungeon.getCurrRoom() == null) {
@@ -48,6 +58,10 @@ public class RichPresenceDistributor {
     }
   }
   
+  /**
+   * 每回合战斗时的状态更新处理
+   * 在战斗开始或玩家回合开始时调用，更新战斗相关的状态信息
+   */
   public static void OnBattlePerTurn() {
     // 更新概览状态
     RichPresenceUpdater.UpdateOverviewPresence(AbstractDungeon.player, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
@@ -70,6 +84,10 @@ public class RichPresenceDistributor {
     Presenter.Log("Battle presence: " + battleview);
   }
   
+  /**
+   * 思考事件时的状态更新处理
+   * 处理游戏中需要思考选择的事件状态更新
+   */
   public static void OnPonderingEvent() {
     RichPresenceUpdater.UpdateActionPresence(AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
     String eventview = RichPresenceUpdater.OVERVIEW_PRESENCE;
@@ -78,6 +96,10 @@ public class RichPresenceDistributor {
     Presenter.SetRichPresenceDisplay("status", eventview);
   }
   
+  /**
+   * 卡牌升级时的状态更新处理
+   * 处理玩家升级卡牌时的状态更新
+   */
   public static void OnUpgradeCard() {
     String remarkable = RichPresenceUpdater.OVERVIEW_PRESENCE;
     if (RichPresenceUpdater.REMARKABLE__PRESENCE != null)
@@ -85,6 +107,10 @@ public class RichPresenceDistributor {
     Presenter.SetRichPresenceDisplay("status", remarkable);
   }
   
+  /**
+   * 篝火事件时的状态更新处理
+   * 处理玩家在篝火房间休息时的状态更新
+   */
   public static void OnCampfire() {
     // 安全检查：确保游戏已经初始化完成
     if (AbstractDungeon.player == null) {

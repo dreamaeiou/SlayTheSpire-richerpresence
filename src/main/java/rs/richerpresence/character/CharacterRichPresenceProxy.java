@@ -14,15 +14,59 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rs.richerpresence.utils.RPUtils;
 
+/**
+ * 角色富状态显示代理类
+ * 负责处理Slay the Spire游戏中各种状态的本地化显示文本生成
+ * 包括角色名称、概览状态、战斗状态、事件状态等
+ */
 public class CharacterRichPresenceProxy {
+  /** 角色名称相关的本地化字符串 */
   private static final UIStrings strings = RPUtils.UIStrings("VanillaCharacterStrings");
   
+  /** 角色名称数组，索引对应不同角色 */
   public static final String[] TEXT = strings.TEXT;
   
+  /** 富状态显示相关的本地化字符串 */
   private static final UIStrings presence = RPUtils.UIStrings("RichPresence");
   
+  /** 富状态显示文本数组，包含各种状态模板 */
   public static final String[] PTEXT = presence.TEXT;
   
+  /**
+   * 根据楼层号计算实际的幕数
+   * Exordium: 1-17层 (第1幕)
+   * The City: 18-24层 (第2幕)
+   * The Beyond: 25-51层 (第3幕)
+   * The Heart: 52+层 (第4幕)
+   * 
+   * @param floorNum 游戏内部的楼层号（从0开始）
+   * @return 实际的幕数（从1开始）
+   */
+  public static int getRealActNumber(int floorNum) {
+    // floorNum在游戏内部是从0开始的，所以需要+1来匹配显示的楼层
+    int displayFloor = floorNum + 1;
+    
+    if (displayFloor <= 17) {
+      return 1; // Exordium - 第1幕
+    } else if (displayFloor <= 24) {
+      return 2; // The City - 第2幕
+    } else if (displayFloor <= 51) {
+      return 3; // The Beyond - 第3幕
+    } else {
+      return 4; // The Heart - 第4幕
+    }
+  }
+  
+  /**
+   * 获取卡牌升级时的富状态显示文本
+   * 
+   * @param player 当前玩家
+   * @param card 升级的卡牌
+   * @param ascension 当前难度等级
+   * @param floorNum 当前楼层号
+   * @param actNum 当前幕数
+   * @return 卡牌升级状态文本，如果不符合条件则返回null
+   */
   public static String GetUpgradeRichPresenceDisplay(@NotNull AbstractPlayer player, AbstractCard card, int ascension, int floorNum, int actNum) {
     boolean inDungeon = RPUtils.RoomAvailable();
     boolean outOfCombat = !RPUtils.RoomChecker(MonsterRoom.class, AbstractRoom.RoomPhase.COMBAT);
@@ -55,10 +99,31 @@ public class CharacterRichPresenceProxy {
     return null;
   }
   
+  /**
+   * 获取事件房间的富状态显示文本
+   * 
+   * @param player 当前玩家
+   * @param eventName 事件名称
+   * @param event 当前事件对象
+   * @param ascension 当前难度等级
+   * @param floorNum 当前楼层号
+   * @param actNum 当前幕数
+   * @return 事件状态文本
+   */
   public static String GetEventRichPresenceDisplay(@NotNull AbstractPlayer player, String eventName, AbstractEvent event, int ascension, int floorNum, int actNum) {
     return String.format(PTEXT[6], new Object[] { eventName });
   }
   
+  /**
+   * 获取战斗房间的富状态显示文本
+   * 
+   * @param player 当前玩家
+   * @param monsters 怪物列表
+   * @param ascension 当前难度等级
+   * @param floorNum 当前楼层号
+   * @param actNum 当前幕数
+   * @return 战斗状态文本，如果没有合适的状态则返回null
+   */
   @Nullable
   public static String GetBattleRichPresenceDisplay(@NotNull AbstractPlayer player, List<AbstractMonster> monsters, int ascension, int floorNum, int actNum) {
     StringBuilder sb = new StringBuilder();
@@ -134,6 +199,17 @@ public class CharacterRichPresenceProxy {
     return null;
   }
   
+  /**
+   * 获取游戏概览状态的富状态显示文本
+   * 格式为：[角色名] - [游戏模式]，[进度状态]，已到达第[楼层]层
+   * 
+   * @param player 当前玩家
+   * @param displayName 角色显示名称
+   * @param ascension 当前难度等级
+   * @param floorNum 当前楼层号（内部索引，从0开始）
+   * @param actNum 当前幕数（内部索引，从0开始）
+   * @return 概览状态文本
+   */
   @NotNull
   public static String GetRichPresenceOverviewDisplay(@NotNull AbstractPlayer player, String displayName, int ascension, int floorNum, int actNum) {
     StringBuilder sb = new StringBuilder(displayName + " - ");
@@ -142,7 +218,7 @@ public class CharacterRichPresenceProxy {
     if (Settings.isTrial)
       sb.append(PTEXT[1]); 
     if (ascension > 0)
-      sb.append(String.format(PTEXT[2], new Object[] { Integer.valueOf(ascension) })); 
+      sb.append(String.format(PTEXT[2], new Object[] { Integer.valueOf(getRealActNumber(floorNum)) })); 
     switch (player.chosenClass) {
       case IRONCLAD:
         sb.append(TEXT[4]);
@@ -165,6 +241,7 @@ public class CharacterRichPresenceProxy {
   public static String getCharacterRichPresenceOverviewDisplay(String displayName, int ascension, int floorNum, int actNum) {
     AbstractPlayer player = com.megacrit.cardcrawl.dungeons.AbstractDungeon.player;
     if (player != null) {
+      // 使用正确的actNum值（加1以显示正确的幕数）
       return GetRichPresenceOverviewDisplay(player, displayName, ascension, floorNum, actNum);
     }
     return displayName + " - Playing Slay the Spire";
@@ -174,6 +251,12 @@ public class CharacterRichPresenceProxy {
     return CharacterRichPresenceProxy.PTEXT[10];
   }
   
+  /**
+   * 获取玩家角色的显示名称
+   * 
+   * @param player 游戏中的玩家角色
+   * @return 对应的本地化角色名称
+   */
   public static String GetDisplayName(AbstractPlayer player) {
     switch (player.chosenClass) {
       case IRONCLAD:
