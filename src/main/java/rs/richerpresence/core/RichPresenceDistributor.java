@@ -2,6 +2,7 @@ package rs.richerpresence.core;
 
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import rs.richerpresence.character.CharacterRichPresenceProxy;
 
 public class RichPresenceDistributor {
@@ -12,18 +13,61 @@ public class RichPresenceDistributor {
       return;
     }
     
+    // 检查当前是否处于战斗状态，如果是则跳过状态更新，防止覆盖战斗信息
+    if (RichPresenceUpdater.isInBattleState()) {
+      Presenter.Log("OnRoomTransition: Currently in battle state, skipping to prevent override");
+      return;
+    }
+    
     AbstractPlayer p = AbstractDungeon.player;
     RichPresenceUpdater.UpdateOverviewPresence(p, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
-    String overview = RichPresenceUpdater.OVERVIEW_PRESENCE;
-    Presenter.SetRichPresenceDisplay("status", overview);
+    
+    // 检查是否是怪物房间，如果是则更新战斗状态
+    boolean isMonsterRoom = rs.richerpresence.utils.RPUtils.RoomChecker(com.megacrit.cardcrawl.rooms.MonsterRoom.class);
+    
+    // 检查当前是否在战斗阶段
+    boolean isCombatPhase = AbstractDungeon.getCurrRoom() != null && 
+                            AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT;
+    
+    if (isMonsterRoom && isCombatPhase) {
+      // 在怪物房间且处于战斗阶段，但避免在房间转换时过早调用怪物列表获取
+      // 只设置基础状态，战斗状态由战斗开始事件处理
+      String overview = RichPresenceUpdater.OVERVIEW_PRESENCE;
+      Presenter.SetRichPresenceDisplay("status", overview);
+      Presenter.Log("OnRoomTransition: Monster room in combat phase, but delaying battle state update to avoid crash");
+    } else if (isMonsterRoom && !isCombatPhase) {
+      // 在怪物房间但不在战斗阶段（可能是战斗结束或准备阶段），只设置概览状态
+      String overview = RichPresenceUpdater.OVERVIEW_PRESENCE;
+      Presenter.SetRichPresenceDisplay("status", overview);
+      Presenter.Log("OnRoomTransition: Monster room but not in combat phase, setting overview only");
+    } else {
+      // 不是怪物房间，只设置概览状态
+      String overview = RichPresenceUpdater.OVERVIEW_PRESENCE;
+      Presenter.SetRichPresenceDisplay("status", overview);
+      Presenter.Log("OnRoomTransition: Not monster room, setting overview only");
+    }
   }
   
   public static void OnBattlePerTurn() {
-    RichPresenceUpdater.UpdateActionPresence(AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
+    // 更新概览状态
+    RichPresenceUpdater.UpdateOverviewPresence(AbstractDungeon.player, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
+    
+    // 只有在需要时才更新动作状态
+    boolean isMonsterRoom = rs.richerpresence.utils.RPUtils.RoomChecker(com.megacrit.cardcrawl.rooms.MonsterRoom.class);
+    if (isMonsterRoom) {
+      RichPresenceUpdater.UpdateActionPresence(AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
+    }
+    
+    // 构建战斗状态信息
     String battleview = RichPresenceUpdater.OVERVIEW_PRESENCE;
-    if (RichPresenceUpdater.ACTION_PRESENCE != null)
+    if (RichPresenceUpdater.ACTION_PRESENCE != null && !RichPresenceUpdater.ACTION_PRESENCE.isEmpty())
       battleview = battleview + " - " + RichPresenceUpdater.ACTION_PRESENCE; 
     Presenter.SetRichPresenceDisplay("status", battleview);
+    
+    // 标记当前处于战斗状态，防止被后续事件覆盖
+    RichPresenceUpdater.setInBattleState(true);
+    
+    Presenter.Log("Battle presence: " + battleview);
   }
   
   public static void OnPonderingEvent() {

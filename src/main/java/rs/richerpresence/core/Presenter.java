@@ -39,6 +39,16 @@ public class Presenter implements EditStringsSubscriber, OnStartBattleSubscriber
   
   public static boolean UsingDefaultDistributor = false;
   
+  private static boolean isInBattle = false;
+  
+  public static boolean getIsInBattle() {
+    return isInBattle;
+  }
+  
+  public static void setIsInBattle(boolean inBattle) {
+    isInBattle = inBattle;
+  }
+  
   public static void initialize() {
     Presenter instance = new Presenter();
     BaseMod.subscribe((ISubscriber)instance);
@@ -60,6 +70,27 @@ public class Presenter implements EditStringsSubscriber, OnStartBattleSubscriber
   }
   
   public static void SetRichPresenceDisplay(String key, String msg) {
+    // 如果在战斗状态且设置的是status键，则需要特殊处理
+    if ("status".equals(key) && isInBattle && RichPresenceUpdater.isInBattleState()) {
+      // 获取当前的战斗相关信息，确保战斗状态不被覆盖
+      String overview = RichPresenceUpdater.OVERVIEW_PRESENCE;
+      String action = RichPresenceUpdater.ACTION_PRESENCE;
+      
+      // 如果我们要设置的是概览状态（不含战斗信息）且当前有战斗信息，则构建完整状态
+      if (msg.equals(overview) && action != null && !action.isEmpty()) {
+        String combinedMsg = overview + " - " + action;
+        Log("Prevented overview-only update during battle, setting combined: " + combinedMsg);
+        switch (GameDistributor) {
+          case "steam":
+            SetSteamRichPresenceDisplay(key, combinedMsg);
+            return;
+          case "discord":
+            SetDiscordRichPresenceDisplay("", combinedMsg);
+            return;
+        }
+      }
+    }
+    
     switch (GameDistributor) {
       case "steam":
         SetSteamRichPresenceDisplay(key, msg);
@@ -94,8 +125,16 @@ public class Presenter implements EditStringsSubscriber, OnStartBattleSubscriber
   
   private static void setSteamRichPresenceData(String key, String value) {
     SteamFriends steamFriends = (SteamFriends)ReflectionHacks.getPrivateStatic(SteamIntegration.class, "steamFriends");
-    if (steamFriends != null && !steamFriends.setRichPresence(key, value))
-      Log("Failed to set STEAM rich presence [ key = " + key + ", value = " + value + " ]"); 
+    if (steamFriends != null) {
+      boolean success = steamFriends.setRichPresence(key, value);
+      if (success) {
+        Log("Successfully set STEAM rich presence [ key = " + key + ", value = " + value + " ]");
+      } else {
+        Log("Failed to set STEAM rich presence [ key = " + key + ", value = " + value + " ]");
+      }
+    } else {
+      Log("SteamFriends is null, cannot set rich presence");
+    }
   }
   
   private static void clearSteamRichPresenceData() {
@@ -121,16 +160,21 @@ public class Presenter implements EditStringsSubscriber, OnStartBattleSubscriber
   
   public void receiveOnBattleStart(AbstractRoom room) {
     Log("receiveOnBattleStart called");
+    setIsInBattle(true);
     RichPresenceDistributor.OnBattlePerTurn();
   }
   
   public void receiveOnPlayerTurnStart() {
     Log("receiveOnPlayerTurnStart called");
+    setIsInBattle(true);
     RichPresenceDistributor.OnBattlePerTurn();
   }
   
   public void receivePostBattle(AbstractRoom room) {
     Log("receivePostBattle called");
+    // 清除战斗状态标记，允许更新非战斗状态
+    RichPresenceUpdater.setInBattleState(false);
+    setIsInBattle(false);
     RichPresenceDistributor.OnRoomTransition();
   }
   

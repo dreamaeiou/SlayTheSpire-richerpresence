@@ -27,6 +27,8 @@ public class RichPresenceUpdater {
   
   protected static String REMARKABLE__PRESENCE;
   
+  private static boolean battleState = false;
+  
   protected static void UpdateOverviewPresence(AbstractPlayer player, int ascension, int floorNum, int actNum) {
     String displayName = getCharacterDisplayName(player);
     String msg = getCharacterRichPresenceOverviewDisplay(displayName, ascension, floorNum, actNum);
@@ -47,14 +49,29 @@ public class RichPresenceUpdater {
                 ", isRestRoom: " + isRestRoom);
     
     if (isMonsterRoom) {
-      List<AbstractMonster> monsters = LMSK.GetAllExptMstr(m -> true);
-      if (monsters != null) {
-        RPUtils.Log("Found " + monsters.size() + " monsters");
-        monsters.sort(Comparator.comparing(m -> m.type));
-        msg = getCharacterBattleRichPresenceDisplay(monsters, ascension, floorNum, actNum);
-        RPUtils.Log("Battle presence: " + msg);
+      // 安全检查：确保游戏已经完全初始化，避免在初始化阶段调用导致崩溃
+      if (AbstractDungeon.getCurrRoom() == null || AbstractDungeon.getCurrRoom().monsters == null) {
+        RPUtils.Log("UpdateActionPresence: Game not fully initialized, skipping monster list retrieval");
+        // 保持之前的战斗状态，不设置为null
+        if (ACTION_PRESENCE != null && ACTION_PRESENCE.contains("正在与")) {
+          RPUtils.Log("Keeping previous battle state: " + ACTION_PRESENCE);
+          return;
+        }
       } else {
-        RPUtils.Log("Monsters list is null");
+        List<AbstractMonster> monsters = LMSK.GetAllExptMstr(m -> true);
+        if (monsters != null && !monsters.isEmpty()) {
+          RPUtils.Log("Found " + monsters.size() + " monsters");
+          monsters.sort(Comparator.comparing(m -> m.type));
+          msg = getCharacterBattleRichPresenceDisplay(monsters, ascension, floorNum, actNum);
+          RPUtils.Log("Battle presence: " + msg);
+        } else {
+          RPUtils.Log("Monsters list is null or empty");
+          // 保持之前的战斗状态，不设置为null
+          if (ACTION_PRESENCE != null && ACTION_PRESENCE.contains("正在与")) {
+            RPUtils.Log("Keeping previous battle state: " + ACTION_PRESENCE);
+            return;
+          }
+        }
       }
     } else if (isEventRoom) {
       AbstractEvent event = (AbstractDungeon.getCurrRoom()).event;
@@ -67,8 +84,17 @@ public class RichPresenceUpdater {
       RPUtils.Log("Rest presence: " + msg);
     } else {
       RPUtils.Log("UpdateActionPresence: Not a monster, event, or rest room");
+      // 只有在明确离开战斗状态时才清除战斗信息
+      if (phase == AbstractRoom.RoomPhase.COMBAT) {
+        RPUtils.Log("Still in combat phase, keeping battle state");
+        return;
+      }
     }
-    ACTION_PRESENCE = msg;
+    
+    // 只有当msg不为null时才更新ACTION_PRESENCE
+    if (msg != null) {
+      ACTION_PRESENCE = msg;
+    }
   }
   
   public static void UpdateRemarkablePresence(RemarkableThing remarkable, int ascension, int floorNum, int actNum) {
@@ -98,26 +124,43 @@ public class RichPresenceUpdater {
   }
   
   private static String getCharacterRichPresenceDisplayOnUpgrade(AbstractCard card, int ascension, int floorNum, int actNum) {
-    return null;
+    AbstractPlayer player = com.megacrit.cardcrawl.dungeons.AbstractDungeon.player;
+    if (player != null) {
+      return rs.richerpresence.character.CharacterRichPresenceProxy.GetUpgradeRichPresenceDisplay(player, card, ascension, floorNum, actNum);
+    }
+    return "Upgrading card: " + card.name;
   }
   
   private static String getCharacterEventRichPresenceDisplay(String eventName, AbstractEvent event, int ascension, int floorNum, int actNum) {
-    return null;
+    AbstractPlayer player = com.megacrit.cardcrawl.dungeons.AbstractDungeon.player;
+    if (player != null) {
+      return rs.richerpresence.character.CharacterRichPresenceProxy.GetEventRichPresenceDisplay(player, eventName, event, ascension, floorNum, actNum);
+    }
+    return "Playing event: " + eventName;
   }
   
   private static String getCharacterBattleRichPresenceDisplay(List<AbstractMonster> monsters, int ascension, int floorNum, int actNum) {
-    return null;
+    return rs.richerpresence.character.CharacterRichPresenceProxy.getCharacterBattleRichPresenceDisplay(monsters, ascension, floorNum, actNum);
   }
   
   private static String getCharacterRestRichPresenceDisplay(int ascension, int floorNum, int actNum) {
-    return CharacterRichPresenceProxy.PTEXT[10];
+    return rs.richerpresence.character.CharacterRichPresenceProxy.getCharacterRestRichPresenceDisplay(ascension, floorNum, actNum);
   }
   
   private static String getCharacterRichPresenceOverviewDisplay(String displayName, int ascension, int floorNum, int actNum) {
-    return null;
+    return rs.richerpresence.character.CharacterRichPresenceProxy.getCharacterRichPresenceOverviewDisplay(displayName, ascension, floorNum, actNum);
   }
   
   private static String getCharacterDisplayName(@NotNull AbstractPlayer player) {
     return player.getLocalizedCharacterName();
+  }
+  
+  public static boolean isInBattleState() {
+    return battleState;
+  }
+  
+  public static void setInBattleState(boolean inBattle) {
+    battleState = inBattle;
+    RPUtils.Log("Battle state set to: " + battleState);
   }
 }
