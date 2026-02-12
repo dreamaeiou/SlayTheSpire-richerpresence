@@ -55,10 +55,6 @@ mvn clean package
 - **CharacterRichPresenceProxy**：角色状态显示代理
 - **RichPresenceDistributor**：状态信息分发器
 
-### 基于Somdy代码的改进
-- 修复了boss战斗时怪物名称显示问题
-- 优化了状态更新逻辑
-- 改进了多语言支持
 
 ## 配置说明
 
@@ -67,8 +63,7 @@ Mod支持多语言，语言文件位于：
 ```
 src/main/resources/RPAssets/locals/
 ├── eng/ui.json    # 英文
-├── zhs/ui.json    # 简体中文
-└── zht/ui.json    # 繁体中文
+└── zhs/ui.json    # 简体中文
 ```
 
 ## 问题排查
@@ -89,14 +84,3 @@ Mod会在游戏日志中输出调试信息，可以通过查看日志来排查�
 
 本项目采用MIT许可证，详见LICENSE文件。
 
-## 更新日志
-
-### v1.0.1
-- 修复了boss战斗时怪物名称显示问题
-- 优化了状态更新逻辑
-- 改进了多语言支持
-
-### v1.0.0
-- 初始版本发布
-- 支持基本的状态显示功能
-- 支持Steam和Discord平台
