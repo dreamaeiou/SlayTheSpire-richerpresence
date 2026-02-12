@@ -25,7 +25,7 @@ public class Presenter implements EditStringsSubscriber, OnStartBattleSubscriber
   
   public static final String PREFIX = "richerpre";
   
-  public static final String[] AUTHORS = new String[] { "Somdy" };
+  public static final String[] AUTHORS = new String[] { "Dreamaeiou" };
   
   public static final String DESCRIPTION = "Richer presence information";
   
