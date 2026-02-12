@@ -25,7 +25,7 @@
 ### 前置要求
 - [ModTheSpire](https://github.com/kiooeht/ModTheSpire)
 - [BaseMod](https://github.com/daviscook477/BaseMod)
-- [Lazy Man's Kits](https://github.com/LazyManKits/LazyManKits)
+- [Lazy Man's Kits](https://github.com/Somdy/LazyManKits)
 
 ### 安装步骤
 1. 确保已安装前置Mod
@@ -66,12 +66,6 @@ src/main/resources/RPAssets/locals/
 └── zhs/ui.json    # 简体中文
 ```
 
-## 问题排查
-
-### 常见问题
-1. **状态不显示**：检查前置Mod是否正确安装
-2. **怪物名称不显示**：确保游戏语言设置正确
-3. **Steam状态不更新**：检查Steam客户端是否正常运行
 
 ### 日志查看
 Mod会在游戏日志中输出调试信息，可以通过查看日志来排查问题。
