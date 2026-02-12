@@ -1,0 +1,29 @@
+{
+  "richerpre:RichPresence": {
+    "TEXT": [
+      "in Daily, ",
+      "in Custom, ",
+      "at A%d, ",
+      "has reached Floor %d",
+
+      "Fighting with %s",
+      "Fighting %s to the DEATH",
+
+      "Pondering what to choose in %s",
+      "Unknown Event",
+
+      "Just upgraded %s !!",
+      "Has Searing Blow upgraded to +%s !!!"
+    ]
+  },
+
+  "richerpre:VanillaCharacterStrings": {
+    "TEXT": [
+      "Bro. Ironclad", "Huntress", "Defects", "Watcher",
+      "steadily, ",
+      "cautiously, ",
+      "desperately, ",
+      "easily, "
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "modid": "RicherPresence",
+  "name": "Richer Presence",
+  "author_list": ["Somdy"],
+  "description": "\nDisplay richer presence information when playing.",
+  "version": "1.0.1",
+  "sts_version": "12-22-2020",
+  "mts_version": "3.30.0",
+  "dependencies": ["basemod", "LazyManKits"]
+}
