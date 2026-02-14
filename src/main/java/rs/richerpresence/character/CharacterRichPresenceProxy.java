@@ -248,7 +248,33 @@ public class CharacterRichPresenceProxy {
   }
   
   public static String getCharacterRestRichPresenceDisplay(int ascension, int floorNum, int ascensionLevel) {
-    return CharacterRichPresenceProxy.PTEXT[10];
+    // 如果PTEXT[10]不存在，默认返回休息相关的文本
+    if (PTEXT.length > 10) {
+      return CharacterRichPresenceProxy.PTEXT[10];
+    } else {
+      // 根据语言环境返回默认的休息文本
+      String language = com.megacrit.cardcrawl.core.Settings.language.name();
+      if (language.equals("ZHS") || language.equals("ZHT")) {
+        return "正在篝火旁休息";
+      } else {
+        return "Resting at Campfire";
+      }
+    }
+  }
+  
+  public static String getCharacterShopRichPresenceDisplay(int ascension, int floorNum, int ascensionLevel) {
+    // 如果PTEXT[11]不存在，默认返回商店相关的文本
+    if (PTEXT.length > 11) {
+      return CharacterRichPresenceProxy.PTEXT[11];
+    } else {
+      // 根据语言环境返回默认的商店文本
+      String language = com.megacrit.cardcrawl.core.Settings.language.name();
+      if (language.equals("ZHS") || language.equals("ZHT")) {
+        return "正在访问商店";
+      } else {
+        return "Visiting the Shop";
+      }
+    }
   }
   
   /**

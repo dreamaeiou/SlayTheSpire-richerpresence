@@ -12,6 +12,7 @@ import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.rooms.EventRoom;
 import com.megacrit.cardcrawl.rooms.MonsterRoom;
 import com.megacrit.cardcrawl.rooms.RestRoom;
+import com.megacrit.cardcrawl.rooms.ShopRoom;
 import java.util.Comparator;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -66,13 +67,15 @@ public class RichPresenceUpdater {
     boolean isMonsterRoom = RPUtils.RoomChecker(MonsterRoom.class);
     boolean isEventRoom = RPUtils.RoomChecker(EventRoom.class);
     boolean isRestRoom = RPUtils.RoomChecker(RestRoom.class);
+    boolean isShopRoom = RPUtils.RoomChecker(ShopRoom.class);
     AbstractRoom.RoomPhase phase = AbstractDungeon.getCurrRoom() != null ? AbstractDungeon.getCurrRoom().phase : null;
     
     RPUtils.Log("UpdateActionPresence - Room: " + (AbstractDungeon.getCurrRoom() != null ? AbstractDungeon.getCurrRoom().getClass().getSimpleName() : "null") + 
                 ", Phase: " + phase + 
                 ", isMonsterRoom: " + isMonsterRoom + 
                 ", isEventRoom: " + isEventRoom + 
-                ", isRestRoom: " + isRestRoom);
+                ", isRestRoom: " + isRestRoom + 
+                ", isShopRoom: " + isShopRoom);
     
     if (isMonsterRoom) {
       // 安全检查：确保游戏已经完全初始化，避免在初始化阶段调用导致崩溃
@@ -108,8 +111,12 @@ public class RichPresenceUpdater {
       RPUtils.Log("UpdateActionPresence: Detected RestRoom, calling getCharacterRestRichPresenceDisplay");
       msg = getCharacterRestRichPresenceDisplay(ascension, floorNum, ascensionLevel);
       RPUtils.Log("Rest presence: " + msg);
+    } else if (isShopRoom) {
+      RPUtils.Log("UpdateActionPresence: Detected ShopRoom, calling getCharacterShopRichPresenceDisplay");
+      msg = getCharacterShopRichPresenceDisplay(ascension, floorNum, ascensionLevel);
+      RPUtils.Log("Shop presence: " + msg);
     } else {
-      RPUtils.Log("UpdateActionPresence: Not a monster, event, or rest room");
+      RPUtils.Log("UpdateActionPresence: Not a monster, event, rest, or shop room");
       // 只有在明确离开战斗状态时才清除战斗信息
       if (phase == AbstractRoom.RoomPhase.COMBAT) {
         RPUtils.Log("Still in combat phase, keeping battle state");
@@ -180,6 +187,10 @@ public class RichPresenceUpdater {
   
   private static String getCharacterRestRichPresenceDisplay(int ascension, int floorNum, int actNum) {
     return rs.richerpresence.character.CharacterRichPresenceProxy.getCharacterRestRichPresenceDisplay(ascension, floorNum, actNum);
+  }
+  
+  private static String getCharacterShopRichPresenceDisplay(int ascension, int floorNum, int actNum) {
+    return rs.richerpresence.character.CharacterRichPresenceProxy.getCharacterShopRichPresenceDisplay(ascension, floorNum, actNum);
   }
   
   private static String getCharacterRichPresenceOverviewDisplay(String displayName, int ascension, int floorNum, int actNum) {

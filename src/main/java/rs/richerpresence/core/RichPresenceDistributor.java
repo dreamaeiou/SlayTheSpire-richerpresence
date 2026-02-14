@@ -108,6 +108,31 @@ public class RichPresenceDistributor {
   }
   
   /**
+   * 访问商店时的状态更新处理
+   * 处理玩家在商店房间时的状态更新
+   */
+  public static void OnShopVisit() {
+    // 安全检查：确保游戏已经初始化完成
+    if (AbstractDungeon.player == null) {
+      Presenter.Log("OnShopVisit skipped: Game not fully initialized");
+      return;
+    }
+    
+    Presenter.Log("OnShopVisit: Starting shop visit presence update");
+    AbstractPlayer p = AbstractDungeon.player;
+    RichPresenceUpdater.UpdateOverviewPresence(p, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.ascensionLevel);
+    RichPresenceUpdater.UpdateActionPresence(AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.ascensionLevel);
+    
+    // 构建商店状态信息
+    String shopview = RichPresenceUpdater.OVERVIEW_PRESENCE;
+    if (RichPresenceUpdater.ACTION_PRESENCE != null)
+      shopview = shopview + " - " + RichPresenceUpdater.ACTION_PRESENCE; 
+    Presenter.SetRichPresenceDisplay("status", shopview);
+    
+    Presenter.Log("Shop presence: " + shopview);
+  }
+  
+  /**
    * 篝火事件时的状态更新处理
    * 处理玩家在篝火房间休息时的状态更新
    */
