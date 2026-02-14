@@ -71,6 +71,6 @@ public class UpgradePatch {
   public static void CallOnUpgrade(AbstractCard card) {
     boolean inDungeon = RPUtils.RoomAvailable();
     if (inDungeon && card != null)
-      RichPresenceUpdater.UpdateRemarkablePresence(RemarkableThing.UPGRADING_CARD.setRemark(card), AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum); 
+      RichPresenceUpdater.UpdateRemarkablePresence(RemarkableThing.UPGRADING_CARD.setRemark(card), AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.ascensionLevel); 
   }
 }

@@ -30,7 +30,7 @@ public class RichPresenceDistributor {
     }
     
     AbstractPlayer p = AbstractDungeon.player;
-    RichPresenceUpdater.UpdateOverviewPresence(p, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
+    RichPresenceUpdater.UpdateOverviewPresence(p, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.ascensionLevel);
     
     // 检查是否是怪物房间，如果是则更新战斗状态
     boolean isMonsterRoom = rs.richerpresence.utils.RPUtils.RoomChecker(com.megacrit.cardcrawl.rooms.MonsterRoom.class);
@@ -64,12 +64,12 @@ public class RichPresenceDistributor {
    */
   public static void OnBattlePerTurn() {
     // 更新概览状态
-    RichPresenceUpdater.UpdateOverviewPresence(AbstractDungeon.player, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
+    RichPresenceUpdater.UpdateOverviewPresence(AbstractDungeon.player, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.ascensionLevel);
     
     // 只有在需要时才更新动作状态
     boolean isMonsterRoom = rs.richerpresence.utils.RPUtils.RoomChecker(com.megacrit.cardcrawl.rooms.MonsterRoom.class);
     if (isMonsterRoom) {
-      RichPresenceUpdater.UpdateActionPresence(AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
+      RichPresenceUpdater.UpdateActionPresence(AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.ascensionLevel);
     }
     
     // 构建战斗状态信息
@@ -89,7 +89,7 @@ public class RichPresenceDistributor {
    * 处理游戏中需要思考选择的事件状态更新
    */
   public static void OnPonderingEvent() {
-    RichPresenceUpdater.UpdateActionPresence(AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
+    RichPresenceUpdater.UpdateActionPresence(AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.ascensionLevel);
     String eventview = RichPresenceUpdater.OVERVIEW_PRESENCE;
     if (RichPresenceUpdater.ACTION_PRESENCE != null)
       eventview = eventview + " - " + RichPresenceUpdater.ACTION_PRESENCE; 
@@ -120,7 +120,7 @@ public class RichPresenceDistributor {
     
     Presenter.Log("OnCampfire: Starting campfire presence update");
     AbstractPlayer p = AbstractDungeon.player;
-    RichPresenceUpdater.UpdateOverviewPresence(p, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.actNum);
+    RichPresenceUpdater.UpdateOverviewPresence(p, AbstractDungeon.ascensionLevel, AbstractDungeon.floorNum, AbstractDungeon.ascensionLevel);
     Presenter.Log("OnCampfire: Overview presence updated");
     
     // 设置篝火状态

@@ -45,11 +45,11 @@ public class RichPresenceUpdater {
    * @param player 当前玩家对象
    * @param ascension 当前难度等级
    * @param floorNum 当前楼层号
-   * @param actNum 当前幕数
+   * @param ascensionLevel 当前进阶等级
    */
-  protected static void UpdateOverviewPresence(AbstractPlayer player, int ascension, int floorNum, int actNum) {
+  protected static void UpdateOverviewPresence(AbstractPlayer player, int ascension, int floorNum, int ascensionLevel) {
     String displayName = getCharacterDisplayName(player);
-    String msg = getCharacterRichPresenceOverviewDisplay(displayName, ascension, floorNum, actNum);
+    String msg = getCharacterRichPresenceOverviewDisplay(displayName, ascension, floorNum, ascensionLevel);
     OVERVIEW_PRESENCE = msg;
   }
   
@@ -59,9 +59,9 @@ public class RichPresenceUpdater {
    * 
    * @param ascension 当前难度等级
    * @param floorNum 当前楼层号
-   * @param actNum 当前幕数
+   * @param ascensionLevel 当前进阶等级
    */
-  protected static void UpdateActionPresence(int ascension, int floorNum, int actNum) {
+  protected static void UpdateActionPresence(int ascension, int floorNum, int ascensionLevel) {
     String msg = null;
     boolean isMonsterRoom = RPUtils.RoomChecker(MonsterRoom.class);
     boolean isEventRoom = RPUtils.RoomChecker(EventRoom.class);
@@ -88,7 +88,7 @@ public class RichPresenceUpdater {
         if (monsters != null && !monsters.isEmpty()) {
           RPUtils.Log("Found " + monsters.size() + " monsters");
           monsters.sort(Comparator.comparing(m -> m.type));
-          msg = getCharacterBattleRichPresenceDisplay(monsters, ascension, floorNum, actNum);
+          msg = getCharacterBattleRichPresenceDisplay(monsters, ascension, floorNum, ascensionLevel);
           RPUtils.Log("Battle presence: " + msg);
         } else {
           RPUtils.Log("Monsters list is null or empty");
@@ -102,11 +102,11 @@ public class RichPresenceUpdater {
     } else if (isEventRoom) {
       AbstractEvent event = (AbstractDungeon.getCurrRoom()).event;
       String eventName = getEventName(event);
-      msg = getCharacterEventRichPresenceDisplay(eventName, event, ascension, floorNum, actNum);
+      msg = getCharacterEventRichPresenceDisplay(eventName, event, ascension, floorNum, ascensionLevel);
       RPUtils.Log("Event presence: " + msg);
     } else if (isRestRoom) {
       RPUtils.Log("UpdateActionPresence: Detected RestRoom, calling getCharacterRestRichPresenceDisplay");
-      msg = getCharacterRestRichPresenceDisplay(ascension, floorNum, actNum);
+      msg = getCharacterRestRichPresenceDisplay(ascension, floorNum, ascensionLevel);
       RPUtils.Log("Rest presence: " + msg);
     } else {
       RPUtils.Log("UpdateActionPresence: Not a monster, event, or rest room");
@@ -130,16 +130,16 @@ public class RichPresenceUpdater {
    * @param remarkable 特殊事件对象
    * @param ascension 当前难度等级
    * @param floorNum 当前楼层号
-   * @param actNum 当前幕数
+   * @param ascensionLevel 当前进阶等级
    */
-  public static void UpdateRemarkablePresence(RemarkableThing remarkable, int ascension, int floorNum, int actNum) {
+  public static void UpdateRemarkablePresence(RemarkableThing remarkable, int ascension, int floorNum, int ascensionLevel) {
     Object remark;
     switch (remarkable.desc) {
       case 0:
         remark = remarkable.remark;
         if (remark instanceof AbstractCard) {
           AbstractCard card = (AbstractCard)remark;
-          REMARKABLE__PRESENCE = getCharacterRichPresenceDisplayOnUpgrade(card, ascension, floorNum, actNum);
+          REMARKABLE__PRESENCE = getCharacterRichPresenceDisplayOnUpgrade(card, ascension, floorNum, ascensionLevel);
           RichPresenceDistributor.OnUpgradeCard();
         } 
         break;

@@ -64,10 +64,10 @@ public class CharacterRichPresenceProxy {
    * @param card 升级的卡牌
    * @param ascension 当前难度等级
    * @param floorNum 当前楼层号
-   * @param actNum 当前幕数
+   * @param ascensionLevel 当前进阶等级
    * @return 卡牌升级状态文本，如果不符合条件则返回null
    */
-  public static String GetUpgradeRichPresenceDisplay(@NotNull AbstractPlayer player, AbstractCard card, int ascension, int floorNum, int actNum) {
+  public static String GetUpgradeRichPresenceDisplay(@NotNull AbstractPlayer player, AbstractCard card, int ascension, int floorNum, int ascensionLevel) {
     boolean inDungeon = RPUtils.RoomAvailable();
     boolean outOfCombat = !RPUtils.RoomChecker(MonsterRoom.class, AbstractRoom.RoomPhase.COMBAT);
     if (inDungeon && outOfCombat) {
@@ -107,10 +107,10 @@ public class CharacterRichPresenceProxy {
    * @param event 当前事件对象
    * @param ascension 当前难度等级
    * @param floorNum 当前楼层号
-   * @param actNum 当前幕数
+   * @param ascensionLevel 当前进阶等级
    * @return 事件状态文本
    */
-  public static String GetEventRichPresenceDisplay(@NotNull AbstractPlayer player, String eventName, AbstractEvent event, int ascension, int floorNum, int actNum) {
+  public static String GetEventRichPresenceDisplay(@NotNull AbstractPlayer player, String eventName, AbstractEvent event, int ascension, int floorNum, int ascensionLevel) {
     return String.format(PTEXT[6], new Object[] { eventName });
   }
   
@@ -121,11 +121,11 @@ public class CharacterRichPresenceProxy {
    * @param monsters 怪物列表
    * @param ascension 当前难度等级
    * @param floorNum 当前楼层号
-   * @param actNum 当前幕数
+   * @param ascensionLevel 当前进阶等级
    * @return 战斗状态文本，如果没有合适的状态则返回null
    */
   @Nullable
-  public static String GetBattleRichPresenceDisplay(@NotNull AbstractPlayer player, List<AbstractMonster> monsters, int ascension, int floorNum, int actNum) {
+  public static String GetBattleRichPresenceDisplay(@NotNull AbstractPlayer player, List<AbstractMonster> monsters, int ascension, int floorNum, int ascensionLevel) {
     StringBuilder sb = new StringBuilder();
     
     // 检查是否是Boss房间
@@ -191,10 +191,10 @@ public class CharacterRichPresenceProxy {
     return null;
   }
   
-  public static String getCharacterBattleRichPresenceDisplay(List<AbstractMonster> monsters, int ascension, int floorNum, int actNum) {
+  public static String getCharacterBattleRichPresenceDisplay(List<AbstractMonster> monsters, int ascension, int floorNum, int ascensionLevel) {
     AbstractPlayer player = com.megacrit.cardcrawl.dungeons.AbstractDungeon.player;
     if (player != null) {
-      return GetBattleRichPresenceDisplay(player, monsters, ascension, floorNum, actNum);
+      return GetBattleRichPresenceDisplay(player, monsters, ascension, floorNum, ascensionLevel);
     }
     return null;
   }
@@ -207,18 +207,18 @@ public class CharacterRichPresenceProxy {
    * @param displayName 角色显示名称
    * @param ascension 当前难度等级
    * @param floorNum 当前楼层号（内部索引，从0开始）
-   * @param actNum 当前幕数（内部索引，从0开始）
+   * @param ascensionLevel 当前进阶等级
    * @return 概览状态文本
    */
   @NotNull
-  public static String GetRichPresenceOverviewDisplay(@NotNull AbstractPlayer player, String displayName, int ascension, int floorNum, int actNum) {
+  public static String GetRichPresenceOverviewDisplay(@NotNull AbstractPlayer player, String displayName, int ascension, int floorNum, int ascensionLevel) {
     StringBuilder sb = new StringBuilder(displayName + " - ");
     if (Settings.isDailyRun)
       sb.append(PTEXT[0]); 
     if (Settings.isTrial)
       sb.append(PTEXT[1]); 
-    if (ascension > 0)
-      sb.append(String.format(PTEXT[2], new Object[] { Integer.valueOf(getRealActNumber(floorNum)) })); 
+    if (ascensionLevel > 0)
+      sb.append(String.format(PTEXT[2], new Object[] { Integer.valueOf(ascensionLevel) })); 
     switch (player.chosenClass) {
       case IRONCLAD:
         sb.append(TEXT[4]);
@@ -238,16 +238,16 @@ public class CharacterRichPresenceProxy {
     return sb.toString();
   }
   
-  public static String getCharacterRichPresenceOverviewDisplay(String displayName, int ascension, int floorNum, int actNum) {
+  public static String getCharacterRichPresenceOverviewDisplay(String displayName, int ascension, int floorNum, int ascensionLevel) {
     AbstractPlayer player = com.megacrit.cardcrawl.dungeons.AbstractDungeon.player;
     if (player != null) {
-      // 使用正确的actNum值（加1以显示正确的幕数）
-      return GetRichPresenceOverviewDisplay(player, displayName, ascension, floorNum, actNum);
+      // 使用正确的ascensionLevel值（显示进阶等级）
+      return GetRichPresenceOverviewDisplay(player, displayName, ascension, floorNum, ascensionLevel);
     }
     return displayName + " - Playing Slay the Spire";
   }
   
-  public static String getCharacterRestRichPresenceDisplay(int ascension, int floorNum, int actNum) {
+  public static String getCharacterRestRichPresenceDisplay(int ascension, int floorNum, int ascensionLevel) {
     return CharacterRichPresenceProxy.PTEXT[10];
   }
   
